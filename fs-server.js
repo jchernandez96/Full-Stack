@@ -32,6 +32,7 @@ const server = http.createServer((req, res)=>{
             //Mensaje de exito por HTTP
             //Caso De Exito - Leemos Archivo
             EventEmitter.emit("fileRead","messages.txt")
+            //Data por HTTP
             res.writeHead(200,{"content-type":"text/plain"});
             res.end(`Exito de lectura de archivo ${data}`);
         });
