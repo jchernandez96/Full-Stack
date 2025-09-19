@@ -1,14 +1,20 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path")
-const ev = require("events")
+const eventos = require("events")
 
 //Create  event emitter
-const EventEmitter = new ev();
+const EventEmitter = new eventos();
+
+//Registro de eventos
+EventEmitter.on("fileRead",(filename)=>{
+    console.log(`File "${filename}" fue leido con exito`)
+});
 
 //Server 
 const server = http.createServer((req, res)=>{
 
+    //Registro de Routas
     const filePath = path.join(__dirname, "messages.txt");
 
     if(req.url==="/"){
@@ -17,12 +23,15 @@ const server = http.createServer((req, res)=>{
     }
     else if(req.url === "/leer"){
             fs.readFile(filePath, "utf-8",(err,data)=>{
+            //Error Leyendo Archivo
             if(err){
                 //Mensaje de error por HTTP
                 res.writeHead(500, {"content-type":"text/plain"});
                 res.end("Error de lectura de archivo");
             };
             //Mensaje de exito por HTTP
+            //Caso De Exito - Leemos Archivo
+            EventEmitter.emit("fileRead","messages.txt")
             res.writeHead(200,{"content-type":"text/plain"});
             res.end(`Exito de lectura de archivo ${data}`);
         });
