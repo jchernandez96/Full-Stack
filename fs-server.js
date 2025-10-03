@@ -11,8 +11,22 @@ EventEmitter.on("fileRead",(filename)=>{
     console.log(`File "${filename}" fue leido con exito`)
 });
 
+//Funtion to log requests
+async function logRequest(req){
+    const logMessage = `${new Date().toISOString()} ${req.method} ${req.url}\n`;
+    const logFilePath = path.join(__dirname, "log.txt");
+
+    try {
+        await fs.promises.appendFile(logFilePath, logMessage);
+        console.log("Request writing to log file successfully");
+    } catch (err) {
+        console.error("Error writing to log file:", err);
+    }
+}
+
 //Server 
-const server = http.createServer((req, res)=>{
+const server = http.createServer(async (req, res)=>{
+    await logRequest(req); //Log each request
 
     //Registro de Routas
     const filePath = path.join(__dirname, "messages.txt");
@@ -24,7 +38,7 @@ const server = http.createServer((req, res)=>{
 
     // Leer archivo
     else if(req.url === "/leer"){
-            fs.readFile(filePath, "utf-8",(err,data)=>{
+        fs.readFile(filePath, "utf-8",(err,data)=>{
             //Error Leyendo Archivo
             if(err){
                 //Mensaje de error por HTTP
